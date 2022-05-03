@@ -1,0 +1,24 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'eclipse'
+apply plugin: 'java'
+
+allprojects {
+ 	repositories {
+	    mavenCentral()
+	 }
+}
+
+
+dependencies {
+   	compile 'org.json:json:20090211'
+}
+
+jar{
+    baseName = 'BPMNDomainClasses'
+    version =  '0.1.0'
+}

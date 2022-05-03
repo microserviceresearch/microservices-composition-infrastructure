@@ -1,7 +1,7 @@
 # Microservice composition based on the Choreography of BPMN fragments. Infrastructure
 
 This repositry contains a software infrastructure to create a choreographed composition of microservices by using BPMN diagrams. 
-An example using this infrastructure is available in the following Github repository: [microservices-composition-example](https://github.com/pvalderas/microservices-composition-example).
+An example using this infrastructure is available in the following Github repository: [microservices-composition-example](https://github.com/microserviceresearch/microservices-composition-example).
 
 It has been implemented by using:
 

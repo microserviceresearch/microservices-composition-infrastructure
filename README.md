@@ -28,6 +28,7 @@ The architectural elements that support our proposal are depicted in red. Thery 
 * Business microservices are complemented with a Compositon Coordinator in such a way a business microservice can be considered as the assembly of two main elements:  The Composition Coordinator, which is in charge of interpreting BPMN fragments in order to execute tasks and interact with other microservices; and the backend, which implements the functionality required to execute the tasks of each microservice. The Composition Coordinator endows each microservice with a PMN Editor based on BPMN.io in order to modify its BPMN fragment.
 * The Global Composition Manager microservice, which is in charge of managing the big picture of a microservice composition. It stores the BPMN model that describes the complete composition. It also updates it when a microservice evolves its corresponding fragment. In addition, it is in charge of sending each composition to the Fragment Manager. The Global Manager is complemented with a BPMN Editor based on BPMN.io in order to create microservice compositions.
 * The Fragment Manager microservice, which plays the role of gateway between the Global Composition Manager and the Composition Coordinator of each microservice. It is in charge of splitting a global BPMN composition into fragments, and distribute these fragments among the different Composition Coordinators.
+* The Rule Adaptation Provider, which is in charge of applying a machine learning algorithm in order to identify an adaptation plan to be applied  by the Global Composition Manager into the big picture when a microservice performs a local change in its BPMN fragment.
 
 # Creating a Global Composition Manager
 
@@ -51,6 +52,8 @@ server:
 composition:
   fragmentmanager:
     url: http://localhost:8083/compositions
+  ruleadaptationprovider:
+    url: http://localhost:8082/adaptation
   serviceregistry:
     url: http://localhost:9999/eureka-server
     type: eureka
@@ -74,6 +77,30 @@ Next, you must create an application.yml file, indicating the url of the Global 
 ```yml
 server:
   port: 8083
+
+composition:
+  globalcompositionmanager:
+    url: http://localhost:8084
+```
+
+# Creating a Rule Adaptation Provider
+
+To create a Rule Adaptation Provider you can use Gradle to build the corresponding project in this repository and include it as a dependency of a Spring Boot Application. Then, you just need to annotate the main class with the annotation ```@RuleAdaptationProvider``` as presented bellow. Note that the ```@SpringBootApplication``` annotation must be configured to find beans in the ```es.upv.pros.research.microservice``` package.
+
+```java
+@RuleAdaptationProvider
+@SpringBootApplication(scanBasePackages = {"es.upv.pros.research.microservice"})
+public class RuleAdaptationProviderMicroservice {
+  public static void main(String[] args) {
+    SpringApplication.run(RuleAdaptationProviderMicroservice.class, args);
+  }
+}
+```
+Next, you must create an application.yml file, indicating the url of the Rule Adaptation Provider.
+
+```yml
+server:
+  port: 8082
 
 composition:
   globalcompositionmanager:
@@ -123,6 +150,8 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:2222/eureka
 ```
+
+
 # Using the infrastructure to create, execute, and evolve a microservice composition
 
 In [microservices-composition-example](https://github.com/microserviceresearch/microservices-composition-example) you can find the implementation of a case study based on the process of purchase orders. In this example, it is explained how using the BPMN editor of the Global Composition Manager, how executing the composition, and how evolving a composition from both big picture created with the Global Composition Manager and the BPMN fragments available in each microservice.
